@@ -1,0 +1,56 @@
+package com.xzl.bat.service;
+
+import com.xzl.bat.domain.modul.WxbWorkitem;
+import com.xzl.bat.domain.modul.WxbWorkitemGroup;
+import com.xzl.boilerplate.common.dto.Pager;
+
+import java.util.List;
+
+public interface WxbWorkitemService {
+    /**
+     * 获取保养单
+     * @param pager
+     * @return
+     */
+    Pager<WxbWorkitemGroup> getItemGroup(Pager pager);
+
+    /**
+     * 保养单详情
+     * @param pager
+     * @return
+     */
+    Pager<WxbWorkitem> getItemsByGroup(Pager pager,Integer groupId);
+
+    /**
+     * 所有保养项目
+     */
+    Pager<WxbWorkitem> dimGetAllItems(WxbWorkitem wxbWorkitem,Pager pager);
+    Pager<WxbWorkitem> getAllItems(Pager pager);
+
+    /**
+     * 保养单详情 添加
+     */
+    void addItemToGroup(Integer groupId, Integer itemId);
+
+    /**
+     * 保养单详情 删除
+     */
+    void delItemFromGroup(Integer groupId, Integer itemId);
+
+    /**
+     * 删除保养项
+     */
+    void addItem(WxbWorkitem wxbWorkitem);
+
+    /**
+     * 添加保养项
+     */
+    void delItem(WxbWorkitem wxbWorkitem);
+
+    /**
+     * 编辑保养项
+     */
+    void editItem(WxbWorkitem wxbWorkitem);
+
+    List<WxbWorkitem> getItemsByGroup(Integer groupId);
+}

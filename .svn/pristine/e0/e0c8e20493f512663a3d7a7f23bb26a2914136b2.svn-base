@@ -1,0 +1,48 @@
+package com.xzl.bat.domain.modul;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Data;
+import org.springframework.stereotype.Component;
+
+import javax.persistence.Id;
+import java.util.Date;
+
+@Data
+@Component
+public class WxbOrderInfo {
+    @Id
+    private Integer id;
+
+    private Integer orderId;
+
+    private String plotName;
+
+    private String liftName;
+
+    private String registCode;
+
+    private Integer singleRule;
+
+    private Integer maintListId;
+
+    private String maintListName;
+
+    private Byte serviceStatus; // 0 否 1 是
+
+    private String lon;
+
+    private String lat;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date lastHalfMon;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date lastQuarter;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date lastHalfYear;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date lastYear;
+
+}

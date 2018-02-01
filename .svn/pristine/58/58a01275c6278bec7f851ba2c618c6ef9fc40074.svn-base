@@ -1,0 +1,9 @@
+package com.xzl.bat.domain.mapper;
+
+import com.xzl.bat.domain.modul.WxbWorkitemConn;
+import com.xzl.bat.domain.tk.TKMapper;
+import org.springframework.stereotype.Component;
+
+@Component
+public interface WxbWorkitemConnMapper extends TKMapper<WxbWorkitemConn>{
+}

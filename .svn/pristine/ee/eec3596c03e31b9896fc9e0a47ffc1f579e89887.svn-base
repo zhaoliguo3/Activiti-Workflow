@@ -1,0 +1,13 @@
+package com.xzl.bat.service;
+
+import com.xzl.bat.domain.modul.WxbUser;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
+public interface WxbUserService {
+    List<WxbUser> getUsersByManager(Integer managerId);
+
+    WxbUser getUser(Integer userId);
+}

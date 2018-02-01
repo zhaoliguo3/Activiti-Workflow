@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xzl.bat.domain.mapper.WxbOrderMapper">
+  <resultMap id="BaseResultMap" type="com.xzl.bat.domain.modul.WxbOrder">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="plot_name" jdbcType="VARCHAR" property="plotName" />
+    <result column="plot_address" jdbcType="VARCHAR" property="plotAddress" />
+    <result column="plot_id" jdbcType="INTEGER" property="plotId" />
+    <result column="num" jdbcType="INTEGER" property="num" />
+    <result column="maint_type" jdbcType="INTEGER" property="maintType" />
+    <result column="maint_type_name" jdbcType="VARCHAR" property="maintTypeName" />
+    <result column="start_time" jdbcType="TIMESTAMP" property="startTime" />
+    <result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
+    <result column="property" jdbcType="VARCHAR" property="property" />
+    <result column="property_name" jdbcType="VARCHAR" property="propertyName" />
+    <result column="maint_comp" jdbcType="INTEGER" property="maintComp" />
+    <result column="maint_comp_name" jdbcType="VARCHAR" property="maintCompName" />
+    <result column="maint_manager" jdbcType="INTEGER" property="maintManager" />
+    <result column="maint_manager_name" jdbcType="VARCHAR" property="maintManagerName" />
+    <result column="manager_phone" jdbcType="VARCHAR" property="managerPhone" />
+    <result column="lift_loc_st" jdbcType="INTEGER" property="liftLocSt" />
+    <result column="maint_data_st" jdbcType="INTEGER" property="maintDataSt"/>
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="order_code" jdbcType="VARCHAR" property="orderCode" />
+    <result column="workers" jdbcType="VARCHAR" property="workers" />
+  </resultMap>
+  <resultMap id="WxbOrderAppDTO" type="com.xzl.bat.domain.dto.WxbOrderAppDTO">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="plot" jdbcType="VARCHAR" property="plot" />
+    <result column="plot_address" jdbcType="VARCHAR" property="plotAddress" />
+    <result column="num" jdbcType="INTEGER" property="num" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, plot_name, plot_address, plot_id, num, maint_type, maint_type_name, start_time, end_time,
+    property, property_name, maint_comp, maint_comp_name, maint_manager, maint_manager_name, 
+    manager_phone, lift_loc_st, status, order_code, workers
+  </sql>
+
+  <select id="dimSelect" parameterType="com.xzl.bat.domain.modul.WxbOrder" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM wxb_order
+    <where>
+      <if test="item.id != null" >
+        AND id LIKE CONCAT('%',#{item.id},'%')
+      </if>
+      <if test="item.plotName != null" >
+        AND (plot_name LIKE CONCAT('%',#{item.plotName},'%') OR plot_address LIKE CONCAT('%',#{item.plotName},'%') )
+      </if>
+      <if test="item.status != null" >
+        AND status LIKE CONCAT('%',#{item.status},'%')
+      </if>
+    </where>
+  </select>
+
+  <select id="selectByMtId" parameterType="java.lang.Integer" resultMap="WxbOrderAppDTO">
+    SELECT id,plot,num,status,plot_address
+    FROM wxb_order
+    WHERE maint_manager=#{id}
+  </select>
+
+  <select id="selectWxbUserByWorkOrderId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+
+  </select>
+
+  <update id="updateStatus" parameterType="java.lang.Integer">
+    update wxb_order
+    SET status = #{status}
+    WHERE id = #{id}
+  </update>
+</mapper>

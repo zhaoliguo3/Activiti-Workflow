@@ -1,0 +1,18 @@
+package com.xzl.bat.domain.mapper;
+
+import com.xzl.bat.domain.modul.WxbOrder;
+import com.xzl.bat.domain.tk.TKMapper;
+import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+@Component
+public interface WxbOrderMapper extends TKMapper<WxbOrder> {
+    List<WxbOrder> dimSelect(@Param("item") WxbOrder wxbOrder);
+
+    List<WxbOrder> selectByMtId(@Param("id") Integer mtManagerId);
+
+    void updateStatus(@Param("id") Integer orderId,@Param("status")Integer status);
+
+    WxbOrder selectWxbUserByWorkOrderId(@Param("workOrderId") Integer workOrderId);
+}

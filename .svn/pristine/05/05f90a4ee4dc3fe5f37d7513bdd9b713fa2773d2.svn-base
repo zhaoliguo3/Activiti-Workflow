@@ -1,0 +1,19 @@
+package com.xzl.bat.domain.modul;
+
+import lombok.Data;
+
+import javax.persistence.Id;
+
+@Data
+public class WxbStateInfo {
+
+        @Id
+        private Integer guid;
+
+        private Integer stateCode;
+
+        private String stateName;
+
+        private String colorCode;
+
+}

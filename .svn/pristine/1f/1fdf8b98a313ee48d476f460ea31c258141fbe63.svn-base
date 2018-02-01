@@ -1,0 +1,123 @@
+package com.xzl.bat.service.impl;
+
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.xzl.bat.domain.dto.MtPlanSelective;
+import com.xzl.bat.domain.mapper.WxbMtPlanMapper;
+import com.xzl.bat.domain.mapper.WxbOrderMapper;
+import com.xzl.bat.domain.mapper.WxbOrderInfoMapper;
+import com.xzl.bat.domain.modul.WxbMtPlan;
+import com.xzl.bat.domain.modul.WxbOrder;
+import com.xzl.bat.domain.modul.WxbOrderInfo;
+import com.xzl.bat.domain.modul.WxbUser;
+import com.xzl.bat.service.WxbOrderService;
+import com.xzl.bat.utils.WxbStatus;
+import com.xzl.boilerplate.common.dto.Pager;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+@Service
+public class WxbOrderServiceImpl implements WxbOrderService{
+    @Autowired
+    WxbOrderMapper wxbOrderMapper;
+    @Autowired
+    WxbOrderInfoMapper wxbOrderInfoMapper;
+    @Autowired
+    WxbMtPlanMapper wxbMtPlanMapper;
+
+    @Override
+    public Integer addOrder(WxbOrder wxbOrder) {
+        wxbOrderMapper.insertSelective(wxbOrder);
+        return wxbOrder.getId();
+    }
+
+    @Override
+    public void delOrder(WxbOrder wxbOrder) {
+        wxbOrderMapper.deleteByPrimaryKey(wxbOrder.getId());
+    }
+
+    @Override
+    public void updateOrder(WxbOrder wxbOrder) {
+        wxbOrderMapper.updateByPrimaryKeySelective(wxbOrder);
+    }
+
+    @Override
+    public Pager dimGetAll(Pager pager,WxbOrder wxbOrder) {
+        PageHelper.startPage(pager.getIndex(), pager.getSize());
+        List<WxbOrder> list = wxbOrderMapper.dimSelect(wxbOrder);
+        PageInfo pageInfo = new PageInfo(list);
+        pager.setList(list);
+        pager.setTotal((int) pageInfo.getTotal());
+        return pager;
+    }
+
+    @Override
+    public List<WxbOrder> getAllNoPage() {
+        return wxbOrderMapper.selectAll();
+    }
+
+    @Override
+    public List<WxbOrder> getByMt(Integer mtManagerId) {
+        return wxbOrderMapper.selectByMtId(mtManagerId);
+    }
+
+    @Override
+    public boolean addRecords(List<WxbOrderInfo> list) {
+        for (WxbOrderInfo record : list) {
+            wxbOrderInfoMapper.insertSelective(record);
+        }
+        return true;
+    }
+
+    @Override
+    public Pager<WxbOrderInfo> dimGetOrderInfo(WxbOrderInfo wxbOrderInfo, Pager pager) {
+        PageHelper.startPage(pager.getIndex(), pager.getSize());
+        List<WxbOrderInfo> list = wxbOrderInfoMapper.dimSelectByOrder(wxbOrderInfo);
+        PageInfo pageInfo = new PageInfo(list);
+        pager.setList(list);
+        pager.setTotal((int) pageInfo.getTotal());
+        return pager;
+    }
+
+    @Override
+    public Pager<WxbOrderInfo> getOrderInfo(Integer orderId,Pager pager) {
+        PageHelper.startPage(pager.getIndex(), pager.getSize());
+        List<WxbOrderInfo> list = wxbOrderInfoMapper.selectByOrder(orderId);
+        PageInfo pageInfo = new PageInfo(list);
+        pager.setList(list);
+        pager.setTotal((int) pageInfo.getTotal());
+        return pager;
+    }
+
+    @Override
+    public void updateOrderInfo(WxbOrderInfo wxbOrderInfo) {
+        wxbOrderInfoMapper.updateByPrimaryKeySelective(wxbOrderInfo);
+    }
+
+    @Override
+    public void allotOrderToManager(Integer orderId) {
+        wxbOrderMapper.updateStatus(orderId, WxbStatus.ORDER_ALLOTED);
+    }
+
+    @Override
+    public List<WxbMtPlan> getMtPlanList(Integer orderId) {
+        Calendar calender = Calendar.getInstance();
+        calender.set(Calendar.HOUR, 0);
+        calender.set(Calendar.MINUTE, 0);
+        calender.set(Calendar.SECOND, 0);
+        calender.set(Calendar.MILLISECOND, 0);
+        Date start = calender.getTime();
+        calender.add(Calendar.DATE,31);
+        Date end = calender.getTime();
+        return wxbMtPlanMapper.selectMtPlanList(new MtPlanSelective(orderId,start,end));
+    }
+
+    @Override
+    public WxbOrder getWxbUserByWorkOrderId(Integer workOrderId) {
+        return wxbOrderMapper.selectWxbUserByWorkOrderId(workOrderId);
+    }
+}

@@ -1,0 +1,16 @@
+package com.xzl.bat.domain.modul;
+
+import lombok.Data;
+
+import javax.persistence.Id;
+
+@Data
+public class WxbWorkitemConn {
+    @Id
+    private Integer id;
+
+    private Integer groupId;
+
+    private Integer itemId;
+
+}

@@ -1,0 +1,30 @@
+package com.xzl.bat.domain.modul;
+
+import lombok.Data;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+@Data
+public class WxbMtPlan {
+    private Integer id;
+
+    private Integer orderId;
+
+    private String plotName;
+
+    private Integer plotId;
+
+    private String liftName;
+
+    private String registCode;
+
+    private String mtTypeName;
+
+    private int mtType;
+
+    private Date mtTime;
+
+    private Integer status;
+
+}

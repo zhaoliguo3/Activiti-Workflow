@@ -1,0 +1,60 @@
+package com.xzl.bat.domain.modul;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Data;
+
+import javax.persistence.Id;
+import java.util.Date;
+
+@Data
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class WxbOrder {
+    @Id
+    private Integer id;
+
+    private String plotName;
+
+    private String plotAddress;
+
+    private Integer plotId;
+
+    private Integer num;
+
+    private Integer maintType;
+
+    private String maintTypeName;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date startTime;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date endTime;
+
+    private String property;
+
+    private String propertyName;
+
+    private Integer maintComp;
+
+    private String maintCompName;
+
+    private Integer maintManager;
+
+    private String maintManagerName;
+
+    private String managerPhone;
+
+    private Integer liftLocSt; //电梯位置状态由三种：2已全部录入，0未录入，1部分录入
+
+    private Integer status; //工单状态分为三种：0未派发 1已派发   2已结束
+
+    private Integer maintDataSt; //维保相关数据状态由三种：2已全部录入，0未录入，1部分录入
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String orderCode;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String workers;
+}

@@ -1,0 +1,17 @@
+package com.xzl.bat.domain.dto;
+
+import lombok.Data;
+
+import java.util.Date;
+@Data
+public class MtPlanSelective {
+    Integer orderId;
+    Date start;
+    Date end;
+
+    public MtPlanSelective(Integer orderId, Date start, Date end) {
+        this.orderId = orderId;
+        this.start = start;
+        this.end = end;
+    }
+}

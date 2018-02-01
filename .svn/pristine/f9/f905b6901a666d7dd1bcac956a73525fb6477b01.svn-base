@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xzl.bat.domain.mapper.WxbOrderInfoMapper">
+  <resultMap id="BaseResultMap" type="com.xzl.bat.domain.modul.WxbOrderInfo">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="order_id" jdbcType="INTEGER" property="orderId" />
+    <result column="plot_name" jdbcType="VARCHAR" property="plotName" />
+    <result column="lift_name" jdbcType="VARCHAR" property="liftName" />
+    <result column="regist_code" jdbcType="VARCHAR" property="registCode" />
+    <result column="single_rule" jdbcType="INTEGER" property="singleRule" />
+    <result column="maint_list_id" jdbcType="INTEGER" property="maintListId" />
+    <result column="maint_list_name" jdbcType="VARCHAR" property="maintListName"/>
+    <result column="service_status" jdbcType="TINYINT" property="serviceStatus" />
+    <result column="lon" jdbcType="VARCHAR" property="lon" />
+    <result column="lat" jdbcType="VARCHAR" property="lat" />
+    <result column="last_half_mon" jdbcType="TIMESTAMP" property="lastHalfMon" />
+    <result column="last_quarter" jdbcType="TIMESTAMP" property="lastQuarter" />
+    <result column="last_half_year" jdbcType="TIMESTAMP" property="lastHalfYear" />
+    <result column="last_year" jdbcType="TIMESTAMP" property="lastYear" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, order_id, plot_name, lift_name, regist_code, single_rule, maint_list_id, maint_list_name, service_status,
+    lon, lat, last_half_mon, last_quarter, last_half_year, last_year
+  </sql>
+
+  <select id="selectByOrder" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM wxb_order_info
+    WHERE order_id=#{id}
+  </select>
+
+  <select id="dimSelectByOrder" parameterType="com.xzl.bat.domain.modul.WxbOrderInfo" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM wxb_order_info
+    <where>
+      <if test="item.orderId != null" >
+        AND order_id = #{item.orderId}
+      </if>
+      <if test="item.liftName != null" >
+        AND lift_name LIKE CONCAT('%',#{item.liftName},'%')
+      </if>
+      <if test="item.registCode != null" >
+        AND regist_code LIKE CONCAT('%',#{item.registCode},'%')
+      </if>
+    </where>
+  </select>
+</mapper>

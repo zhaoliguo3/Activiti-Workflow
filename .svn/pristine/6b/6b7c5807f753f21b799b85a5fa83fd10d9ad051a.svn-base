@@ -1,0 +1,29 @@
+package com.xzl.bat.domain.modul;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Data;
+
+import javax.persistence.Id;
+
+@Data
+public class WxbUser {
+    @Id
+    private Integer id;
+
+    private String userName;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String userPwd;
+
+    private Integer userType;
+
+    private Integer unitId;
+
+    private String unitName;
+
+    private String imageUrl;
+
+    private String mobilePhone;
+
+    private Integer phoneType;
+}

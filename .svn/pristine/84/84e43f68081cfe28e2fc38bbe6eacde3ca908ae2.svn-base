@@ -1,0 +1,69 @@
+package com.xzl.bat.service;
+
+import com.xzl.bat.domain.modul.WxbMtPlan;
+import com.xzl.bat.domain.modul.WxbOrder;
+import com.xzl.bat.domain.modul.WxbOrderInfo;
+import com.xzl.bat.domain.modul.WxbUser;
+import com.xzl.boilerplate.common.dto.Pager;
+import org.springframework.stereotype.Service;
+
+import java.util.Date;
+import java.util.List;
+
+@Service
+public interface WxbOrderService {
+    Integer addOrder(WxbOrder wxbOrder);
+
+    void delOrder(WxbOrder wxbOrder);
+
+    void updateOrder(WxbOrder wxbOrder);
+
+    /**
+     * 获取所有工单
+     * @return
+     */
+    Pager<WxbOrder> dimGetAll(Pager pager,WxbOrder wxbOrder);
+
+    /**
+     * 获取所有工单 不分页
+     * @return
+     */
+    List<WxbOrder> getAllNoPage();
+
+
+
+    /**
+     * 获取维保工头的工单信息，小区列表
+     * @return
+     */
+    List<WxbOrder> getByMt(Integer mtManagerId);
+
+    boolean addRecords(List<WxbOrderInfo> list);
+
+    /**
+     * 根据工单获取工单详情
+     * @return
+     */
+    Pager<WxbOrderInfo> dimGetOrderInfo(WxbOrderInfo wxbOrderInfo,Pager pager);
+    Pager<WxbOrderInfo> getOrderInfo(Integer orderId,Pager pager);
+
+    /**
+     * 修改订单详情
+     */
+    void updateOrderInfo(WxbOrderInfo wxbOrderInfo);
+
+    /**
+     * 派发工单给工头
+     */
+    void allotOrderToManager(Integer orderId);
+
+    /**
+     * 查询维保计划列表 30天内
+     * @param managerId 工头id
+     * 日期 今天不带小时 分钟 秒
+     * @return
+     */
+    List<WxbMtPlan> getMtPlanList(Integer managerId);
+
+    WxbOrder getWxbUserByWorkOrderId(Integer workOrderId);
+}

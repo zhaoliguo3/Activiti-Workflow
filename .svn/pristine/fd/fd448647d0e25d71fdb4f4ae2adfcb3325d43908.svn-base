@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xzl.bat.domain.mapper.WxbStateInfoMapper">
+    <resultMap id="BaseResultMap" type="com.xzl.bat.domain.modul.WxbStateInfo">
+        <id column="guid" jdbcType="INTEGER" property="guid" />
+        <result column="state_code" jdbcType="INTEGER" property="stateCode" />
+        <result column="state_name" jdbcType="VARCHAR" property="stateName" />
+        <result column="color_code" jdbcType="VARCHAR" property="colorCode" />
+    </resultMap>
+    <sql id="Base_Column_List">
+        guid, state_code, state_name, color_code
+    </sql>
+
+</mapper>

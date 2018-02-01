@@ -1,0 +1,30 @@
+package com.xzl.bat.domain.dto;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.xzl.bat.domain.modul.WxbMtPlan;
+import com.xzl.bat.utils.WxbStatus;
+import lombok.Data;
+
+import java.util.Date;
+
+@Data
+public class MtPlanDTO {
+    private Integer id;
+    private String plotName;
+    private String liftName;
+    private String registCode;
+    private String status;
+    private String maintType;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date mtTime;
+
+    public MtPlanDTO(WxbMtPlan wxbMtPlan) {
+        id = wxbMtPlan.getId();
+        plotName = wxbMtPlan.getPlotName();
+        liftName = wxbMtPlan.getLiftName();
+        registCode = wxbMtPlan.getRegistCode();
+        status = WxbStatus.MTPLAN_STATUS.get(wxbMtPlan.getStatus());
+        maintType = wxbMtPlan.getMtTypeName();
+        mtTime = wxbMtPlan.getMtTime();
+    }
+}

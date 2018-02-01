@@ -1,0 +1,39 @@
+package com.xzl.bat.domain.dto;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Data;
+
+import java.util.Date;
+
+@Data
+public class WxbOrderDTO {
+    private Integer id;
+
+    private String plot;
+
+    private String plotcode;
+
+    private Integer num;
+
+    private Integer mainttype;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date starttime;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date endtime;
+
+    private String property;
+
+    private String maintcomp;
+
+    private String maintmanager;
+
+    private String managerphone;
+
+    private Integer lisftLocSt; // 电梯位置是否已经录入，已全部录入2，未录入0，部分录入1
+
+    private Integer status; //状态：1 未派发（默认） 2 已派发   0 已结束
+
+    private String ordercode;
+}

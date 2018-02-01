@@ -1,0 +1,39 @@
+package com.xzl.bat.service.impl;
+
+import com.xzl.bat.domain.mapper.WxbUserMapper;
+import com.xzl.bat.domain.modul.WxbUser;
+import com.xzl.bat.service.WxbUserService;
+import com.xzl.boilerplate.common.dto.MenuDTO;
+import com.xzl.boilerplate.common.dto.ResultResponse;
+import com.xzl.boilerplate.common.dto.exception.BizCode;
+import com.xzl.boilerplate.common.dto.exception.BizException;
+import com.xzl.boilerplate.common.utils.RestTemplateUtil;
+import com.xzl.boilerplate.common.utils.UrlUtil;
+import org.apache.commons.lang.ArrayUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@Service
+public class WxbUserServiceImpl implements WxbUserService {
+
+    @Autowired
+    WxbUserMapper wxbUserMapper;
+
+    @Override
+    public List<WxbUser> getUsersByManager(Integer managerId) {
+        return wxbUserMapper.selectByManager(managerId);
+    }
+
+    @Override
+    public WxbUser getUser(Integer userId) {
+        return wxbUserMapper.selectByPrimaryKey(userId);
+    }
+
+}

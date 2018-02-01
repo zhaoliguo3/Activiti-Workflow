@@ -1,0 +1,341 @@
+package com.xzl.bat.controller;
+
+import com.xzl.bat.domain.dto.AllotPlanDTO;
+import com.xzl.bat.domain.dto.MicroMaintPlanDTO;
+import com.xzl.bat.domain.dto.MtPlanDTO;
+import com.xzl.bat.domain.dto.push.MsgInfo;
+import com.xzl.bat.domain.dto.push.NoticeDTO;
+import com.xzl.bat.domain.dto.push.NoticeInfo;
+import com.xzl.bat.domain.modul.WxbMtPlan;
+import com.xzl.bat.domain.modul.WxbOrder;
+import com.xzl.bat.domain.modul.WxbOrderInfo;
+import com.xzl.bat.domain.modul.WxbUser;
+import com.xzl.bat.service.WxbOrderService;
+import com.xzl.bat.service.WxbUserService;
+import com.xzl.boilerplate.common.dto.Pager;
+import com.xzl.boilerplate.common.dto.ResultResponse;
+import com.xzl.boilerplate.common.dto.exception.BizCode;
+import com.xzl.boilerplate.common.dto.exception.BizException;
+import com.xzl.boilerplate.common.security.MutableHttpServletRequest;
+import com.xzl.boilerplate.common.utils.RestTemplateUtil;
+import lombok.extern.java.Log;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.*;
+
+@RequestMapping(value = "/order")
+@RestController
+@Log
+public class WxbOrderController {
+
+    @Autowired
+    WxbOrderService wxbOrderService;
+    @Autowired
+    WxbUserService wxbUserService;
+
+    /**
+     * 新增订单
+     *
+     * @param wxbOrder
+     * @return
+     * @throws AuthenticationException
+     */
+    @RequestMapping(value = "/web/${order.version}/maint/add", method = RequestMethod.POST)
+    public ResultResponse addOrder(
+            @RequestBody WxbOrder wxbOrder) throws AuthenticationException {
+        wxbOrderService.addOrder(wxbOrder);
+        return ResultResponse.createSuccessResponse(null);
+    }
+
+    /**
+     * 删除订单
+     *
+     * @param wxbOrder
+     * @return
+     * @throws AuthenticationException
+     */
+    @RequestMapping(value = "/web/${order.version}/maint/del", method = RequestMethod.POST)
+    public ResultResponse delOrder(
+            @RequestBody WxbOrder wxbOrder) throws AuthenticationException {
+        wxbOrderService.delOrder(wxbOrder);
+        return ResultResponse.createSuccessResponse(null);
+    }
+
+    /**
+     * 获取所有订单列表
+     *
+     * @param index size
+     * @return
+     * @throws AuthenticationException
+     */
+    @RequestMapping(value = "/web/${order.version}/maint/plotList", method = RequestMethod.GET)
+    public ResultResponse listOrder(@RequestParam(value = "id",required = false)Integer id,
+                                    @RequestParam(value = "plotName",required = false)String plotName,
+                                    @RequestParam(value = "status",required = false)Integer status,
+                                    @RequestParam(value = "index",required = false,defaultValue = "1") Integer index,
+                                    @RequestParam(value = "size",required = false,defaultValue = "10") Integer size) throws AuthenticationException {
+        Pager page = new Pager(index, size);
+        WxbOrder wxbOrder = new WxbOrder();
+        if (status!=null)
+            wxbOrder.setStatus(status);
+        if (id!=null)
+            wxbOrder.setId(id);
+        if (plotName!=null)
+            wxbOrder.setPlotName(plotName);
+        try {
+            page = wxbOrderService.dimGetAll(page,wxbOrder);
+        } catch (Exception e) {
+            throw new BizException(BizCode.ORDER_LIST_ERROR);
+        }
+        return ResultResponse.createSuccessResponse(page);
+    }
+
+    /**
+     * 获取工头的小区列表
+     *
+     * @return
+     * @throws AuthenticationException
+     */
+    @RequestMapping(value = "/app/${order.version}/maint/manager/plotList", method = RequestMethod.GET)
+    public ResultResponse appListOrder(MutableHttpServletRequest request) throws AuthenticationException {
+        List<WxbOrder> list;
+        try {
+            list = wxbOrderService.getAllNoPage();
+        } catch (Exception e) {
+            throw new BizException(BizCode.ORDER_LIST_ERROR);
+        }
+        return ResultResponse.createSuccessResponse(list);
+    }
+
+    /**
+     * 更新订单信息
+     *
+     * @param wxbOrder
+     * @return
+     * @throws AuthenticationException
+     */
+    @RequestMapping(value = "/web/${order.version}/maint/update", method = RequestMethod.POST)
+    public ResultResponse updateOrder(
+            @RequestBody WxbOrder wxbOrder) throws AuthenticationException {
+        try {
+            wxbOrderService.updateOrder(wxbOrder);
+        } catch (Exception e) {
+            throw new BizException(BizCode.ORDER_UPDATE_ERROR);
+        }
+        return ResultResponse.createSuccessResponse(null);
+    }
+
+
+    /**
+     * 获取订单详情列表
+     *
+     * @param orderId
+     * @return
+     * @throws AuthenticationException
+     */
+    @RequestMapping(value = "/web/${order.version}/maint/manager/orderInfoList", method = RequestMethod.GET)
+    public ResultResponse orderInfoList(@RequestParam(value = "liftName",required = false) String liftName,
+                                        @RequestParam(value = "registCode",required = false) String registCode,
+                                        @RequestParam Integer orderId,
+                                        @RequestParam(value = "index",required = false,defaultValue = "1") Integer index,
+                                        @RequestParam(value = "size",required = false,defaultValue = "10") Integer size) throws AuthenticationException {
+        Pager pager = new Pager(index, size);
+        WxbOrderInfo wxbOrderInfo = new WxbOrderInfo();
+        if (liftName!=null)
+            wxbOrderInfo.setLiftName(liftName);
+        if (registCode!=null)
+            wxbOrderInfo.setRegistCode(registCode);
+        wxbOrderInfo.setOrderId(orderId);
+        try {
+            pager = wxbOrderService.dimGetOrderInfo(wxbOrderInfo, pager);
+        } catch (Exception e) {
+            throw new BizException(BizCode.ORDER_LIST_ERROR);
+        }
+
+        return ResultResponse.createSuccessResponse(pager);
+    }
+
+    /**
+     * 修改订单详情
+     *
+     * @param wxbOrderInfo
+     * @return
+     * @throws AuthenticationException
+     */
+    @RequestMapping(value = "/web/${order.version}/maint/manager/orderInfoList", method = RequestMethod.POST)
+    public ResultResponse updateOrderInfo(@RequestBody WxbOrderInfo wxbOrderInfo) throws AuthenticationException {
+        try {
+            wxbOrderService.updateOrderInfo(wxbOrderInfo);
+        } catch (Exception e) {
+            throw new BizException(BizCode.ORDER_LIST_ERROR);
+        }
+
+        return ResultResponse.createSuccessResponse(null);
+    }
+
+    /**
+     * 派发工单给工头
+     * 调用通知接口 通知工头
+     */
+    @RequestMapping(value = "/web/${order.version}/maint/manager/allotOrder", method = RequestMethod.GET)
+    public ResultResponse allotOrder(
+            @RequestParam Integer orderId) throws AuthenticationException {
+        try {
+            wxbOrderService.allotOrderToManager(orderId);
+        } catch (Exception e) {
+            throw new BizException(BizCode.ORDER_LIST_ERROR);
+        }
+
+        return ResultResponse.createSuccessResponse(null);
+    }
+
+    /**
+     * 工头派发工单给工人
+     * 调用维保微服务接口 maintPlanList 计划列表 userList人员列表
+     */
+    @RequestMapping(value = "/app/${order.version}/maint/manager/allotPlan", method = RequestMethod.POST)
+    public ResultResponse allotPlan(
+            @RequestBody AllotPlanDTO allotPlanDTO) throws AuthenticationException {
+        try {
+            wxbOrderService.allotOrderToManager(allotPlanDTO.getOrderId());
+            //调用维保微服务接口
+            List<WxbMtPlan> list = wxbOrderService.getMtPlanList(allotPlanDTO.getOrderId());
+            List<MicroMaintPlanDTO> dtos = new ArrayList<>();
+            for (WxbMtPlan wxbMtPlan : list) {
+                MicroMaintPlanDTO dto = new MicroMaintPlanDTO(wxbMtPlan);
+                dtos.add(dto);
+            }
+
+            String url = "http://172.18.30.249:8293/maint/order/server/createMaintOrder";
+            RestTemplate restTemplate=new RestTemplate();
+            Map body = new HashMap();
+            body.put("maintPlanList", dtos);
+            body.put("userList", allotPlanDTO.getUserList());
+            String token = "eyJhbGciOiJSUzUxMiJ9.eyJndWlkIjoiNDQyIiwiZXhwIjoxNTIzNTYyODgwLCJzdWIiOiJjY2MiLCJjcmVhdGVkIjoxNTE2OTU4MDgwNDc0LCJybHMiOlt7ImF1dGhvcml0eSI6IldYQl9LRlBUIn1dfQ.OXgZXtwsgGfi3wvnRrpxcPIjO5AtRtcpZ9IDEn04S7z_Uyw9wZ22zXxf8_YfN0GFcFvEo2YsIUeo0zUafczdzkL6eNQcjPEocytsm1sekFyJlGh9_SVIq58GVMq3y1wabJdIewMtUgcNItr-jPpEHm7zlZwiSspbJilfC_TU_Lr4KJhJqdfpd7XFqFTBG9QabqvpgPrBIRl53vYkufUqKVdUchMivi5np4NXZmbG9U0wu_wgvxRZ0SB2-1GIdiFERf1Yp6QSASQAZ1hHuhgFdK3-y-Zin9C-SoDflELdNRyCd0G1tM_Sb5mA61gbR1zBUU8IJd4G8cu-x_WaRuqeeg";
+            ResultResponse result = RestTemplateUtil.getResultReponse(restTemplate,url, HttpMethod.POST,body, token);
+
+            if (!(result.getCode() ==200))
+                throw new BizException(BizCode.ALLOT_PAN_ERROR);
+
+            //通知维保工人
+            String urlPush = "http://172.18.20.187:8769/pigeon-server/pushMsg";
+            for (Integer userId : allotPlanDTO.getUserList()) {
+                WxbUser wxbUser = wxbUserService.getUser(userId);
+                NoticeDTO noticeDTO = new NoticeDTO();
+                noticeDTO.setType(wxbUser.getPhoneType());
+                noticeDTO.setAccount(wxbUser.getMobilePhone());
+                noticeDTO.setUid(userId);
+                NoticeInfo noticeInfo = new NoticeInfo();
+                noticeInfo.setMsgType("1010");
+                noticeInfo.setTitle("收到新的任务");
+                noticeInfo.setCreateTime(MicroMaintPlanDTO.simpleDateFormatter.format(new Date()));
+                MsgInfo msgInfo = new MsgInfo();
+                msgInfo.setNoticeMsg("您收到了"+list.size()+"项新任务。");
+
+                noticeInfo.setNotice(msgInfo);
+                noticeDTO.setMsg(noticeInfo);
+
+                ResultResponse resultPush = RestTemplateUtil.getResultReponse(restTemplate, urlPush, HttpMethod.POST, noticeDTO, token);
+            }
+
+
+
+        } catch (Exception e) {
+            throw new BizException(BizCode.ALLOT_PAN_ERROR);
+        }
+
+        return ResultResponse.createSuccessResponse(null);
+    }
+
+    /**
+     * 获取订单维保计划
+     *
+     * @param orderId
+     * @return
+     * @throws AuthenticationException
+     */
+    @RequestMapping(value = "/app/${order.version}/maint/manager/mtPlanList", method = RequestMethod.GET)
+    public ResultResponse mtPlanList(@RequestParam(value = "orderId", required = false) Integer orderId,
+                                     MutableHttpServletRequest request) throws AuthenticationException {
+        if (orderId == null) {
+            log.info("orderId = "+request.getHeader("userId"));
+            orderId = Integer.parseInt(request.getHeader("userId"));
+        }
+        List<MtPlanDTO> planDTOS = new ArrayList<>();
+        try {
+            List<WxbMtPlan> list = wxbOrderService.getMtPlanList(orderId);
+            for (WxbMtPlan wxbMtPlan : list) {
+                MtPlanDTO mtPlanDTO = new MtPlanDTO(wxbMtPlan);
+                planDTOS.add(mtPlanDTO);
+            }
+        } catch (Exception e) {
+            throw new BizException(BizCode.ORDER_LIST_ERROR);
+        }
+
+        return ResultResponse.createSuccessResponse(planDTOS);
+    }
+
+    /**
+     * 获取工人列表
+     */
+    @RequestMapping(value = "/app/${order.version}/maint/manager/workerList", method = RequestMethod.GET)
+    public ResultResponse workerList(@RequestParam("managerId") Integer managerId) throws AuthenticationException {
+        List<WxbUser> list;
+        try {
+            list = wxbUserService.getUsersByManager(managerId);
+        } catch (Exception e) {
+            throw new BizException(BizCode.ORDER_LIST_ERROR);
+        }
+
+        return ResultResponse.createSuccessResponse(list);
+    }
+
+    /**
+     * 获取保养单
+     */
+    @RequestMapping(value = "/web/${order.version}/maint/workItemGroup", method = RequestMethod.GET)
+    public ResultResponse workItemGroup(@RequestParam("managerId") Integer managerId) throws AuthenticationException {
+        List<WxbUser> list;
+        try {
+            list = wxbUserService.getUsersByManager(managerId);
+        } catch (Exception e) {
+            throw new BizException(BizCode.ORDER_LIST_ERROR);
+        }
+
+        return ResultResponse.createSuccessResponse(list);
+    }
+
+    /**
+     * 根据维保工单id 获取小区Id,根据小区id获取 维保工头  物业
+     */
+    @RequestMapping(value = "/web/${order.version}/maint/getMaint", method = RequestMethod.GET)
+    public ResultResponse getMaintProperty(@RequestParam("taskId") Integer taskId) throws AuthenticationException {
+        WxbOrder wxbOrder;
+        try {
+            wxbOrder = wxbOrderService.getWxbUserByWorkOrderId(taskId);
+        } catch (Exception e) {
+            throw new BizException(BizCode.ORDER_LIST_ERROR);
+        }
+        return ResultResponse.createSuccessResponse(wxbOrder.getMaintManager().toString());
+    }
+
+    /**
+     * 根据维保工单id 获取小区Id,根据小区id获取 维保工头  物业
+     */
+    @RequestMapping(value = "/web/${order.version}/maint/getProperty", method = RequestMethod.GET)
+    public ResultResponse getProperty(@RequestParam("taskId") Integer taskId) throws AuthenticationException {
+        WxbOrder wxbOrder;
+        try {
+            wxbOrder = wxbOrderService.getWxbUserByWorkOrderId(taskId);
+        } catch (Exception e) {
+            throw new BizException(BizCode.ORDER_LIST_ERROR);
+        }
+        Map<String, String> user = new HashMap<>();
+        return ResultResponse.createSuccessResponse(wxbOrder.getProperty());
+    }
+
+}

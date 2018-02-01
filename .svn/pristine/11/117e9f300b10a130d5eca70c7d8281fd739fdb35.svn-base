@@ -1,0 +1,16 @@
+package com.xzl.bat.domain.dto;
+
+import lombok.Data;
+
+@Data
+public class WxbOrderAppDTO {
+    private Integer id; //工单id
+
+    private String plot;
+
+    private Integer num;
+
+    private Integer status; //状态：1 未派发（默认） 2 已派发   0 已结束
+
+    private String address; //小区地址
+}

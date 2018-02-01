@@ -1,0 +1,30 @@
+package com.xzl.bat.domain.modul;
+
+import lombok.Data;
+
+import javax.persistence.Id;
+
+@Data
+public class WxbWorkitem {
+    @Id
+    private Integer id;
+
+    private String itemCode;
+
+    private String itemName;
+
+    private Integer maintType;
+
+    private String maintTypeName;
+
+    private String positionCode;
+
+    private String positionName;
+
+    private String mark;
+	
+    private Integer stateGroupCode;
+
+    private String stateGroupName;
+
+}

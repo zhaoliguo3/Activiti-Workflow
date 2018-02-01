@@ -1,0 +1,12 @@
+package com.xzl.bat.domain.dto;
+
+import lombok.Data;
+
+import java.util.Map;
+
+@Data
+public class MaintRequest {
+    private String userId;
+    private String recordId;
+    private Map project;
+}

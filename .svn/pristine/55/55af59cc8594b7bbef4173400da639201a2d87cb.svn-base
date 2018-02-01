@@ -1,0 +1,196 @@
+package com.xzl.bat;
+
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.xzl.bat.domain.dto.MtPlanSelective;
+import com.xzl.bat.domain.mapper.*;
+import com.xzl.bat.domain.modul.WxbOrder;
+import com.xzl.bat.domain.modul.WxbOrderInfo;
+import com.xzl.bat.domain.modul.WxbWorkitem;
+import com.xzl.boilerplate.common.dto.MenuDTO;
+import com.xzl.boilerplate.common.dto.ResultResponse;
+import com.xzl.boilerplate.common.dto.UserDTO;
+import com.xzl.boilerplate.common.utils.RestTemplateUtil;
+import com.xzl.boilerplate.common.utils.UrlUtil;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwt;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.HttpMethod;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.client.RestTemplate;
+
+import java.io.IOException;
+import java.security.*;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.util.*;
+
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class BatApplicationTests {
+
+    @Autowired
+    RestTemplateUtil restTemplateUtil;
+
+    @Autowired
+    User2Mapper user2Mapper;
+
+    @Autowired
+    WxbOrderMapper wxbOrderMapper;
+    @Autowired
+    WxbOrderInfoMapper wxbOrderInfoMapper;
+    @Autowired
+    WxbMtPlanMapper wxbMtPlanMapper;
+    @Autowired
+    WxbWorkitemMapper wxbWorkitemMapper;
+
+
+    @Test
+    public void contextLoads() throws KeyStoreException, IOException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException {
+        ClassPathResource resource = new ClassPathResource("mytest.jks");
+        KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
+        keystore.load(resource.getInputStream(), "mypass".toCharArray());
+
+        Key key = keystore.getKey("mytest", "mypass".toCharArray());
+        Certificate cert = keystore.getCertificate("mytest");
+        PublicKey publicKey = cert.getPublicKey();
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("user", "cope");
+        Calendar expires = Calendar.getInstance();
+        expires.roll(Calendar.HOUR, 2);
+        String s = Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(new Date())
+                .setExpiration(expires.getTime())
+                .signWith(SignatureAlgorithm.RS256, key)
+                .compact();
+        System.out.println(s);
+        Jwt sdf = Jwts.parser().setSigningKey(publicKey).require("user", "cope").parse(s);
+        Claims c2 = (Claims) sdf.getBody();
+        sdf.toString();
+        int a = 1;
+    }
+
+    @Test
+    public void testBasePlate() throws IOException {
+
+        String url = "http://SERVICE-HI/hiya";
+        url = "http://127.0.0.1:8783/hiya?name=jay";
+        Map body = new HashMap();
+        body.put("num", 100);
+        Map headers = new HashMap();
+        headers.put("Content-Type", "application/json");
+        headers.put("AppCode", "WXBAPP");
+        headers.put("Authorization", "Bearer eyJhbGciOiJSUzUxMiJ9.eyJndWlkIjoiMSIsImV4cCI6MTUyMzAyMTkzNiwic3ViIjoiYWRtaW4iLCJjcmVhdGVkIjoxNTE2NDE3MTM2MzEyLCJybHMiOlt7ImF1dGhvcml0eSI6IlRMV19BRE1JTiJ9LHsiYXV0aG9yaXR5IjoiWUhRU0NKREdMSiJ9XX0.GhUVveH4WOYlEhHAaGjHEFNrip2VQL2rHYa5CY9ijA2cGFMYAyYFV7PCWfoihSSaiIdeE5crXf4i8ju9WaxHlkNsQwrBSBafV7RHB5ZKJGxzgDR4WVPMiq8Y8E87cCM8_H6pP5_F-AL4xsfFAwDOwong2msQVlGKjDoG5AAbeSntMsKtY8Y1yN1eDKP1pbyF-YAktE30ixTzN5jl2DbEIzmCrYnh_EY1BlBYvQq9BDVWMY0oqBidQqMWRpzQEsWA9OXQ6Vqrw3QCnFwWSkA7I48SdYgOE7Mqo_ZdEOsXqNYuxFhXr9koI11EwWmlPp4BrzGN4zcyMmURUhQKllGU4A");
+        ResultResponse<String> result = restTemplateUtil.getBasePlatform(String.class,url, headers);
+        url = "http://127.0.0.1:8783/hiya";
+
+//        int a = 1;
+//        Map body = new HashMap();
+//        body.put("userCode", "demo");
+//        body.put("userPwsd", "demo");
+//        Map headers = new HashMap();
+//        headers.put("appCode", "TLW");
+//        headers.put("verifyCode", "06b97038-e6e0-4bd0-a875-fd0fb25560e8");
+//
+//        ResultResponse<MenuDTO[]> rs = restTemplateUtil.getBasePlatform(MenuDTO[].class, "http://192.168.1.87:8081/basePlatform" +
+//                "/menu/queryUserPossessMenus?userId=1&menuType=1", UrlUtil.headers);
+//
+//        ResultResponse<UserDTO> resultResponse = restTemplateUtil.postBasePlatform(UserDTO.class, "http://192.168.1.87:8081/basePlatform/user/userLogin",
+//                body, headers);
+//
+//        int b = 1;
+    }
+
+    @Test
+    public void testMybatis() {
+        String url = "http://bat-server/order/app/v1/maint/manager/workerList?managerId=100";
+        RestTemplate restTemplate=new RestTemplate();
+        Map body = new HashMap();
+        String token = "eyJhbGciOiJSUzUxMiJ9.eyJndWlkIjoiNDQyIiwiZXhwIjoxNTIzNTYyODgwLCJzdWIiOiJjY2MiLCJjcmVhdGVkIjoxNTE2OTU4MDgwNDc0LCJybHMiOlt7ImF1dGhvcml0eSI6IldYQl9LRlBUIn1dfQ.OXgZXtwsgGfi3wvnRrpxcPIjO5AtRtcpZ9IDEn04S7z_Uyw9wZ22zXxf8_YfN0GFcFvEo2YsIUeo0zUafczdzkL6eNQcjPEocytsm1sekFyJlGh9_SVIq58GVMq3y1wabJdIewMtUgcNItr-jPpEHm7zlZwiSspbJilfC_TU_Lr4KJhJqdfpd7XFqFTBG9QabqvpgPrBIRl53vYkufUqKVdUchMivi5np4NXZmbG9U0wu_wgvxRZ0SB2-1GIdiFERf1Yp6QSASQAZ1hHuhgFdK3-y-Zin9C-SoDflELdNRyCd0G1tM_Sb5mA61gbR1zBUU8IJd4G8cu-x_WaRuqeeg";
+        ResultResponse result = RestTemplateUtil.getResultReponse(restTemplate,url, HttpMethod.GET,body, token);
+        List list3=(List)result.getData();
+        Map map=(Map)list3.get(0);
+        String confirmor=(String)map.get("userName");
+
+
+        PageHelper.startPage(1, 3);
+        WxbWorkitem wxbWorkitem = new WxbWorkitem();
+        wxbWorkitem.setItemName("轿厢");
+//        wxbWorkitem.setPositionName("顶");
+//        wxbWorkitem.setMaintTypeName("全");
+        List<WxbWorkitem> list2 = wxbWorkitemMapper.dimSelect(wxbWorkitem);
+        PageInfo pageInfo2 = new PageInfo(list2);
+
+        WxbOrderInfo wxbOrderInfo = new WxbOrderInfo();
+        wxbOrderInfo.setOrderId(10000001);
+        wxbOrderInfo.setRegistCode("330108002");
+        PageHelper.startPage(1, 3);
+        List<WxbOrderInfo> list = wxbOrderInfoMapper.dimSelectByOrder(wxbOrderInfo);
+        PageInfo pageInfo1 = new PageInfo(list);
+
+        WxbOrder wxbOrder = new WxbOrder();
+        wxbOrder.setPlotName("浙江");
+        wxbOrder.setId(1);
+        wxbOrder.setStatus(1);
+        PageHelper.startPage(1, 3);
+        List<WxbOrder> list1 = wxbOrderMapper.dimSelect(wxbOrder);
+        PageInfo pageInfo = new PageInfo(list);
+
+        Calendar calender = Calendar.getInstance();
+        calender.set(Calendar.HOUR, 0);
+        calender.set(Calendar.MINUTE, 0);
+        calender.set(Calendar.SECOND, 0);
+        calender.set(Calendar.MILLISECOND, 0);
+        Date start = calender.getTime();
+        calender.add(Calendar.DATE,31);
+        Date end = calender.getTime();
+        wxbMtPlanMapper.selectMtPlanList(new MtPlanSelective(10000001,start,end));
+
+
+//        WxbOrderInfo wxbOrderInfo = new WxbOrderInfo();
+//        wxbOrderInfo.setLiftName("嘿嘿嘿");
+//        wxbOrderInfo.setId(2);
+//        wxbOrderInfo.setRegistCode("232455");
+//        wxbOrderInfoMapper.updateByPrimaryKeySelective(wxbOrderInfo);
+
+        //分页测试
+//        PageHelper.startPage(2, 3);
+//        List<WxbOrderInfo> list = wxbOrderInfoMapper.selectByOrder(1);
+//        PageInfo pageInfo = new PageInfo(list);
+
+    }
+
+//    @Test
+//    public void testWf() throws IOException {
+//        String url = "http://WORKFLOW-SERVICE/v1/common/start";
+//        Map body = new HashMap();
+//        body.put("num", 100);
+//        String token = "eyJhbGciOiJSUzUxMiJ9.eyJzdWIiOiJkZW1vIiwiY3JlYXRlZCI6MTUxNTYzNTYxNDA0NSwicmxzIjpbeyJhdXRob3JpdHkiOiJyb2xlIn0seyJhdXRob3JpdHkiOiJ1c2VyIn1dLCJleHAiOjE1MjIyNDA0MTR9.F2fQLD0dx4NDYf7GeqXDynjr6uWjdpMK7Np9w57s-H_hPsTI3XZvf1UhXggMiKeD_KaZousUo3DT37_Y3Xoy6kkNQL4LGIDavWv4-c3PdwOgHt3fOQC9Q0amzZ4GHeB_j6sTLfQS8ZRYpmmdQA0Ci4pvO26K5BdSKytXQJ1HcoV9pTogQFonFPEcD53upMSQpmOdwYpa4YJ0JKs9A_a7RhFsnc2pRBk4L6lbDXInYW-3qqQdzLhVNv7Is67bgJG-lZuu4t2sC8g-oGm9zbC1WDNem9_dyO1N-AC70ONsVPkuIpUnpWTTDP2hn-YQUAskwJZ1Et-hTFkG5SVHIBvqFQ";
+//        ResultResponse result = RestTemplateUtil.getResultReponse(restTemplate,url, HttpMethod.POST, body, token);
+//    }
+//    @Test
+//    public void testRedis() {
+//        Calendar calendar = Calendar.getInstance();
+//        calendar.add(Calendar.HOUR, 2);
+//        long expire = calendar.getTime().getTime();
+//        System.out.println(userRedisService.findById("23"));
+//        userRedisService.saveUser("23", "user23Token" + "#" + expire,
+//                BaseTypeConstants.REDIS_TOKEN_EXPIRED_TIME);
+//        String user = userRedisService.findById("23");
+//
+//        userRedisService.saveUser("5", "user5Token" + "#" + expire,60);
+//
+//        String str = userRedisService.findById("23");
+//        String str5 = userRedisService.findById("5");
+//        Date date = new Date(Long.parseLong(str.split("#")[1]));
+//        userRedisService.deleteById("5");
+//        userRedisService.deleteById("5");
+//    }
+}

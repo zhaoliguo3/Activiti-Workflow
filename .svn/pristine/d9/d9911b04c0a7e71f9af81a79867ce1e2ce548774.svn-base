@@ -1,0 +1,110 @@
+package com.xzl.bat.service.impl;
+
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.xzl.bat.domain.mapper.WxbWorkitemConnMapper;
+import com.xzl.bat.domain.mapper.WxbWorkitemGroupMapper;
+import com.xzl.bat.domain.mapper.WxbWorkitemMapper;
+import com.xzl.bat.domain.modul.WxbOrderInfo;
+import com.xzl.bat.domain.modul.WxbWorkitem;
+import com.xzl.bat.domain.modul.WxbWorkitemConn;
+import com.xzl.bat.domain.modul.WxbWorkitemGroup;
+import com.xzl.bat.service.WxbWorkitemService;
+import com.xzl.boilerplate.common.dto.Pager;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class WxbWorkitemServiceImpl implements WxbWorkitemService {
+    @Autowired
+    WxbWorkitemGroupMapper wxbWorkitemGroupMapper;
+    @Autowired
+    WxbWorkitemMapper wxbWorkitemMapper;
+    @Autowired
+    WxbWorkitemConnMapper wxbWorkitemConnMapper;
+    @Override
+    public Pager<WxbWorkitemGroup> getItemGroup(Pager pager) {
+        PageHelper.startPage(pager.getIndex(), pager.getSize());
+        List<WxbWorkitemGroup> list = wxbWorkitemGroupMapper.selectAllGroup();
+        PageInfo pageInfo = new PageInfo(list);
+        for (WxbWorkitemGroup wxbWorkitemGroup : list) {
+            wxbWorkitemGroup.setNum(wxbWorkitemMapper.selectCountByGroupId(wxbWorkitemGroup.getId()));
+        }
+        pager.setList(list);
+        pager.setTotal((int) pageInfo.getTotal());
+        return pager;
+    }
+
+    /**
+     * 保养单详情
+     * @param pager
+     * @return
+     */
+    @Override
+    public Pager<WxbWorkitem> getItemsByGroup(Pager pager,Integer groupId) {
+        PageHelper.startPage(pager.getIndex(), pager.getSize());
+        List<WxbWorkitem> list = wxbWorkitemMapper.selectItemsByGroup(groupId);
+        PageInfo pageInfo = new PageInfo(list);
+        pager.setList(list);
+        pager.setTotal((int) pageInfo.getTotal());
+        return pager;
+    }
+
+    @Override
+    public Pager<WxbWorkitem> dimGetAllItems(WxbWorkitem wxbWorkitem, Pager pager) {
+        PageHelper.startPage(pager.getIndex(), pager.getSize());
+        List<WxbWorkitem> list = wxbWorkitemMapper.dimSelect(wxbWorkitem);
+        PageInfo pageInfo = new PageInfo(list);
+        pager.setList(list);
+        pager.setTotal((int) pageInfo.getTotal());
+        return pager;
+    }
+
+    /**
+     * 所有保养项目
+     */
+    @Override
+    public Pager<WxbWorkitem> getAllItems(Pager pager) {
+        PageHelper.startPage(pager.getIndex(), pager.getSize());
+        List<WxbWorkitem> list = wxbWorkitemMapper.selectAll();
+        PageInfo pageInfo = new PageInfo(list);
+        pager.setList(list);
+        pager.setTotal((int) pageInfo.getTotal());
+        return pager;
+    }
+
+    @Override
+    public void addItemToGroup(Integer groupId, Integer itemId) {
+        WxbWorkitemConn wxbWorkitemConn = new WxbWorkitemConn();
+        wxbWorkitemConnMapper.insert(wxbWorkitemConn);
+    }
+
+    @Override
+    public void delItemFromGroup(Integer groupId, Integer itemId) {
+        WxbWorkitemConn wxbWorkitemConn = new WxbWorkitemConn();
+        wxbWorkitemConnMapper.delete(wxbWorkitemConn);
+    }
+
+    @Override
+    public void addItem(WxbWorkitem wxbWorkitem) {
+        wxbWorkitemMapper.insertSelective(wxbWorkitem);
+    }
+
+    @Override
+    public void delItem(WxbWorkitem wxbWorkitem) {
+        wxbWorkitemMapper.delete(wxbWorkitem);
+    }
+
+    @Override
+    public void editItem(WxbWorkitem wxbWorkitem) {
+        wxbWorkitemMapper.updateByPrimaryKeySelective(wxbWorkitem);
+    }
+
+    @Override
+    public List<WxbWorkitem> getItemsByGroup(Integer wxbWorkItemGroup) {
+        return wxbWorkitemMapper.selectByGroup(wxbWorkItemGroup);
+    }
+
+}

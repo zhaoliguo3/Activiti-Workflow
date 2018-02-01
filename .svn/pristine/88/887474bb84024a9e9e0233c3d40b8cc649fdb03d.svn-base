@@ -1,0 +1,40 @@
+package com.xzl.bat.domain.dto;
+
+import com.xzl.bat.domain.modul.WxbMtPlan;
+import lombok.Data;
+
+import java.text.SimpleDateFormat;
+
+@Data
+public class MicroMaintPlanDTO {
+    public static SimpleDateFormat simpleDateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private Integer planId;
+
+    private String plotName;
+
+    private Integer plotId;
+
+    private String liftName;
+
+    private String registCode;
+
+    private String maintTypeName;
+
+    private int maintType;
+
+    private String planTime;
+
+    public MicroMaintPlanDTO(WxbMtPlan wxbMtPlan) {
+        planId = wxbMtPlan.getId();
+        plotId = wxbMtPlan.getPlotId();
+        plotName = wxbMtPlan.getPlotName();
+        liftName = wxbMtPlan.getLiftName();
+        registCode = wxbMtPlan.getRegistCode();
+        maintTypeName = wxbMtPlan.getMtTypeName();
+        maintType = wxbMtPlan.getMtType();
+        planTime = simpleDateFormatter.format(wxbMtPlan.getMtTime());
+    }
+
+    public MicroMaintPlanDTO() {
+    }
+}
