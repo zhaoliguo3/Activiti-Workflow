@@ -17,6 +17,9 @@ public class Student {
 
     private String school;
 
+    public Student() {
+    }
+
     public Student(String id, String name, Integer age, String school) {
         this.id = id;
         this.name = name;
